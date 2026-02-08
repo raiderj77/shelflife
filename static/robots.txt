@@ -13,4 +13,4 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://shelflife.app/sitemap.xml
+Sitemap: https://shelflife-five.vercel.app/sitemap.xml

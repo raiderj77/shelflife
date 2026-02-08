@@ -1,32 +1,36 @@
 # ShelfLife
 
-> ShelfLife is a free, offline-first Progressive Web App for organizing board game collections, deciding what to play, and logging plays in seconds.
+> ShelfLife is a free, offline-first Progressive Web App for organizing board game collections, deciding what to play, logging plays, and viewing analytics.
 
 ## About
 
-ShelfLife helps board gamers manage their physical game collections digitally. Users can import their games from BoardGameGeek, filter by player count and playing time, use a smart randomizer to pick games for game night, and log plays in under 10 seconds.
+ShelfLife helps board gamers manage their physical game collections digitally. Users can add games manually or import from BoardGameGeek, filter by player count and playing time, use an animated dice-roll randomizer to pick games for game night, log play sessions with winner tracking, and view stats and insights about their gaming habits.
 
-The app works offline — your collection lives on your device and syncs to the cloud when connected. It's installable as a PWA on phones and desktops.
+The app works offline — your collection lives on your device (IndexedDB via Dexie.js) and syncs to the cloud (Supabase) when connected. It's installable as a PWA on phones and desktops.
+
+## Tech Stack
+
+- SvelteKit (Svelte 5) with TypeScript
+- Tailwind CSS v4 + DaisyUI v5
+- Supabase (auth + database)
+- Dexie.js (IndexedDB, offline-first)
+- vite-plugin-pwa (service worker, installable)
+- Deployed on Vercel
 
 ## Key Features
 
-- Import board game collection from BoardGameGeek
-- Filter games by player count, playing time, and categories
-- Random game picker for game night decisions
-- Play logging in under 10 seconds
-- Shareable public collection pages
-- Offline-first architecture — works without internet
-- Free tier with core features, Pro tier for power users
-
-## Pricing
-
-- Free: Up to 50 games, basic filters, random picker, play logging (last 10 plays)
-- Pro: $4.99/month or $49/year — unlimited games, full stats, game night mode, wishlists, group picks
-- Founders Deal: $39.99 one-time for lifetime Pro (limited to 500 spots)
+- Google OAuth and magic link authentication
+- Manual game entry with quick-add presets
+- BoardGameGeek collection import (API token required)
+- Collection views: grid and list with search, filter by player count and playtime
+- Animated dice-roll random game picker with player count buttons
+- Play logging with date, duration, winner, and notes
+- Analytics dashboard with stats, charts, rankings, and insights
+- Two-way offline sync (Dexie.js ↔ Supabase)
+- Installable PWA with offline support
 
 ## Links
 
-- Website: https://shelflife.app
-- Pricing: https://shelflife.app/pricing
-- FAQ: https://shelflife.app/faq
-- Blog: https://shelflife.app/blog
+- Website: https://shelflife-five.vercel.app
+- Login: https://shelflife-five.vercel.app/login
+- Source: https://github.com/raiderj77/shelflife
