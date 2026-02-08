@@ -10,6 +10,7 @@
 
 	let mobileMenuOpen = $state(false);
 	let showOnboarding = $state(false);
+	let onboardingChecked = false;
 
 	// Initialize auth on mount
 	onMount(async () => {
@@ -20,10 +21,13 @@
 	$effect(() => {
 		if (!auth.loading && auth.isLoggedIn && auth.user) {
 			syncStore.initialize(auth.user.id);
-			// Check onboarding
-			const key = `shelflife-onboarding-complete-${auth.user.id}`;
-			if (!localStorage.getItem(key)) {
-				showOnboarding = true;
+			// Check onboarding (only once)
+			if (!onboardingChecked) {
+				onboardingChecked = true;
+				const key = `shelflife-onboarding-complete-${auth.user.id}`;
+				if (!localStorage.getItem(key)) {
+					showOnboarding = true;
+				}
 			}
 		}
 		if (!auth.loading && !auth.isLoggedIn) {

@@ -87,10 +87,15 @@
 	async function handleDeletePlay(playId: number) {
 		if (!confirm('Delete this play log?')) return;
 
-		const { deletePlay } = await import('$lib/db/schema');
-		await deletePlay(playId);
-		await loadPlays();
-		toast.success('Play log deleted');
+		try {
+			const { deletePlay } = await import('$lib/db/schema');
+			await deletePlay(playId);
+			await loadPlays();
+			toast.success('Play log deleted');
+		} catch (err) {
+			console.error('Error deleting play:', err);
+			toast.error('Failed to delete play log');
+		}
 	}
 
 	function formatDate(date: Date) {
@@ -227,9 +232,9 @@
 						<!-- Game Info -->
 						<div class="flex-1">
 							<div class="flex items-center gap-3 mb-2">
-								{#if play.game.thumbnail}
+								{#if play.game.thumbnailUrl}
 									<img
-										src={play.game.thumbnail}
+										src={play.game.thumbnailUrl}
 										alt={play.game.name}
 										class="w-12 h-12 rounded object-cover"
 									/>

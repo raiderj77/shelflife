@@ -224,9 +224,9 @@
 									</div>
 
 									<!-- Thumbnail -->
-									{#if item.game.thumbnail}
+									{#if item.game.thumbnailUrl}
 										<img
-											src={item.game.thumbnail}
+											src={item.game.thumbnailUrl}
 											alt={item.game.name}
 											class="w-12 h-12 rounded object-cover"
 										/>
@@ -250,9 +250,9 @@
 						{#each recentPlays as play}
 							<div class="card bg-surface-1 p-4">
 								<div class="flex items-center gap-3">
-									{#if play.game.thumbnail}
+									{#if play.game.thumbnailUrl}
 										<img
-											src={play.game.thumbnail}
+											src={play.game.thumbnailUrl}
 											alt={play.game.name}
 											class="w-10 h-10 rounded object-cover"
 										/>

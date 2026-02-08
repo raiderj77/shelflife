@@ -23,24 +23,22 @@
 		loading = true;
 		error = '';
 
-		try {
-			await auth.signInWithEmail(email.trim());
+		const { error: err } = await auth.signInWithMagicLink(email.trim());
+		if (err) {
+			error = err.message || 'Something went wrong. Please try again.';
+		} else {
 			magicLinkSent = true;
-		} catch (e: any) {
-			error = e.message || 'Something went wrong. Please try again.';
-		} finally {
-			loading = false;
 		}
+		loading = false;
 	}
 
 	async function handleGoogleLogin() {
 		loading = true;
 		error = '';
 
-		try {
-			await auth.signInWithGoogle();
-		} catch (e: any) {
-			error = e.message || 'Google sign-in failed. Please try again.';
+		const { error: err } = await auth.signInWithGoogle();
+		if (err) {
+			error = err.message || 'Google sign-in failed. Please try again.';
 			loading = false;
 		}
 	}

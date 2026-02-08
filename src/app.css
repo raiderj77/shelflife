@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@plugin "daisyui" {
+  themes: false;
+}
 
 /* ============================================
    ShelfLife — Custom Theme
@@ -37,6 +40,20 @@
   --color-surface-200: #1a1a3a;
   --color-surface-300: #20204a;
   --color-surface-400: #2d2d5a;
+
+  /* Surface aliases (used by layout components) */
+  --color-surface-1: #15152d;
+  --color-surface-2: #1a1a3a;
+
+  /* Accent aliases */
+  --color-accent-primary: #9333ea;
+  --color-accent-secondary: #db2777;
+
+  /* Border color */
+  --color-border: #20204a;
+
+  /* Error color */
+  --color-error: #ef4444;
 
   /* Text */
   --color-text-primary: #f1f3f5;

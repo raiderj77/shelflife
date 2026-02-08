@@ -205,10 +205,10 @@
 			<div class="card bg-surface-1 overflow-hidden mb-6">
 				<div class="md:flex">
 					<!-- Image -->
-					{#if pickedGame.game.thumbnail}
+					{#if pickedGame.game.thumbnailUrl}
 						<div class="md:w-1/3 bg-surface-2 flex items-center justify-center p-6">
 							<img
-								src={pickedGame.game.thumbnail}
+								src={pickedGame.game.thumbnailUrl}
 								alt={pickedGame.game.name}
 								class="max-w-full h-auto rounded-lg shadow-lg"
 							/>
@@ -216,7 +216,7 @@
 					{/if}
 
 					<!-- Details -->
-					<div class="p-6 {pickedGame.game.thumbnail ? 'md:w-2/3' : 'w-full'}">
+					<div class="p-6 {pickedGame.game.thumbnailUrl ? 'md:w-2/3' : 'w-full'}">
 						<h3 class="text-2xl font-bold mb-4">{pickedGame.game.name}</h3>
 
 						<div class="grid grid-cols-2 gap-4 mb-4">
@@ -243,10 +243,10 @@
 								</div>
 							{/if}
 
-							{#if pickedGame.game.rating}
+							{#if pickedGame.game.bggRating}
 								<div>
 									<div class="text-xs text-text-secondary mb-1">BGG Rating</div>
-									<div class="font-semibold">⭐ {pickedGame.game.rating.toFixed(1)}</div>
+									<div class="font-semibold">⭐ {pickedGame.game.bggRating.toFixed(1)}</div>
 								</div>
 							{/if}
 						</div>

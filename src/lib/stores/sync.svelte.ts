@@ -22,6 +22,10 @@ class SyncStore {
 	/** Number of pending items waiting to sync */
 	pendingCount = $state(0);
 
+	/** Track pending counts separately for correct totals */
+	private collectionPending = 0;
+	private playsPending = 0;
+
 	/** Error message if last sync failed */
 	lastError = $state<string | null>(null);
 
@@ -73,14 +77,16 @@ class SyncStore {
 		const collectionSub = liveQuery(() =>
 			db.collection.where('syncStatus').equals('pending').count()
 		).subscribe((count) => {
-			this.pendingCount = count;
+			this.collectionPending = count;
+			this.pendingCount = this.collectionPending + this.playsPending;
 			if (count > 0 && this.isOnline) this.debouncedSync();
 		});
 
 		const playsSub = liveQuery(() =>
 			db.plays.where('syncStatus').equals('pending').count()
 		).subscribe((count) => {
-			this.pendingCount += count;
+			this.playsPending = count;
+			this.pendingCount = this.collectionPending + this.playsPending;
 			if (count > 0 && this.isOnline) this.debouncedSync();
 		});
 
