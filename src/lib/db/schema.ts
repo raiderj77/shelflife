@@ -2,14 +2,14 @@ import Dexie, { type EntityTable } from 'dexie';
 
 /**
  * ShelfLife — Offline Database (Dexie.js / IndexedDB)
- * 
+ *
  * This is the LOCAL source of truth. Every action hits this first,
  * then syncs to Supabase in the background.
- * 
+ *
  * Think of it like this:
  * - Dexie = the game shelf in your house (always there, instant access)
  * - Supabase = the cloud backup (syncs when online)
- * 
+ *
  * Why offline-first? (MyCrochetKit lesson)
  * - Game stores have terrible signal
  * - Friends' houses might not share WiFi
@@ -74,6 +74,8 @@ export interface LocalCollectionGame {
 	updatedAt: Date;
 	/** Sync status with Supabase */
 	syncStatus: 'synced' | 'pending' | 'conflict';
+	/** Supabase collection_games.id (set after first sync) */
+	remoteId?: number;
 }
 
 export interface LocalPlay {
@@ -101,6 +103,23 @@ export interface LocalPlay {
 	createdAt: Date;
 	/** Sync status with Supabase */
 	syncStatus: 'synced' | 'pending' | 'conflict';
+	/** Supabase plays.id (set after first sync) */
+	remoteId?: number;
+}
+
+export interface LocalDeletedItem {
+	/** Local auto-increment ID */
+	id?: number;
+	/** Which table was the item deleted from */
+	table: 'collection' | 'plays';
+	/** BGG ID (for collection items) */
+	bggId?: number;
+	/** Local play ID (for plays) */
+	localPlayId?: number;
+	/** Supabase remote ID if known */
+	remoteId?: number;
+	/** When the deletion happened */
+	deletedAt: Date;
 }
 
 export interface LocalSettings {
@@ -119,24 +138,26 @@ class ShelfLifeDB extends Dexie {
 	collection!: EntityTable<LocalCollectionGame, 'id'>;
 	plays!: EntityTable<LocalPlay, 'id'>;
 	settings!: EntityTable<LocalSettings, 'key'>;
+	deletedItems!: EntityTable<LocalDeletedItem, 'id'>;
 
 	constructor() {
 		super('ShelfLifeDB');
 
 		// Version 1 — Initial schema
-		// The stuff after ++ is auto-increment, & is unique, * is multi-entry
 		this.version(1).stores({
-			// Games master table: auto-ID, unique BGG ID, indexed by name
 			games: '++id, &bggId, name, minPlayers, maxPlayers, playingTime, bggRating, *categories, *mechanics',
-
-			// User's collection: auto-ID, unique BGG ID, indexed for filtering
 			collection: '++id, &bggId, status, personalRating, addedAt, syncStatus',
-
-			// Play logs: auto-ID, indexed by game and date
 			plays: '++id, bggId, playedAt, syncStatus',
-
-			// App settings: key-value store
 			settings: 'key'
+		});
+
+		// Version 2 — Add sync support
+		this.version(2).stores({
+			games: '++id, &bggId, name, minPlayers, maxPlayers, playingTime, bggRating, *categories, *mechanics',
+			collection: '++id, &bggId, status, personalRating, addedAt, syncStatus, remoteId',
+			plays: '++id, bggId, playedAt, syncStatus, remoteId',
+			settings: 'key',
+			deletedItems: '++id, table, bggId, localPlayId'
 		});
 	}
 }
@@ -267,10 +288,20 @@ export async function addToCollection(
 }
 
 /**
- * Remove a game from the collection
+ * Remove a game from the collection (with deletion tracking for sync)
  */
 export async function removeFromCollection(bggId: number): Promise<void> {
-	await db.collection.where('bggId').equals(bggId).delete();
+	const item = await db.collection.where('bggId').equals(bggId).first();
+	if (item) {
+		// Track deletion for sync before removing
+		await db.deletedItems.add({
+			table: 'collection',
+			bggId,
+			remoteId: item.remoteId,
+			deletedAt: new Date()
+		});
+		await db.collection.where('bggId').equals(bggId).delete();
+	}
 }
 
 /**
@@ -282,6 +313,23 @@ export async function logPlay(play: Omit<LocalPlay, 'id' | 'createdAt' | 'syncSt
 		createdAt: new Date(),
 		syncStatus: 'pending'
 	});
+}
+
+/**
+ * Delete a play (with deletion tracking for sync)
+ */
+export async function deletePlay(playId: number): Promise<void> {
+	const play = await db.plays.get(playId);
+	if (play) {
+		await db.deletedItems.add({
+			table: 'plays',
+			localPlayId: playId,
+			bggId: play.bggId,
+			remoteId: play.remoteId,
+			deletedAt: new Date()
+		});
+		await db.plays.delete(playId);
+	}
 }
 
 /**
@@ -349,5 +397,6 @@ export async function clearAllData(): Promise<void> {
 	await db.games.clear();
 	await db.collection.clear();
 	await db.plays.clear();
+	await db.deletedItems.clear();
 	await db.settings.clear();
 }

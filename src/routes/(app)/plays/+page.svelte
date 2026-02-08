@@ -84,10 +84,11 @@
 		}
 	}
 
-	async function deletePlay(playId: number) {
+	async function handleDeletePlay(playId: number) {
 		if (!confirm('Delete this play log?')) return;
-		
-		await db.plays.delete(playId);
+
+		const { deletePlay } = await import('$lib/db/schema');
+		await deletePlay(playId);
 		await loadPlays();
 	}
 
@@ -261,7 +262,7 @@
 
 						<!-- Delete Button -->
 						<button
-							onclick={() => deletePlay(play.id)}
+							onclick={() => handleDeletePlay(play.id)}
 							class="btn btn-sm btn-ghost text-error hover:bg-error/10"
 							title="Delete play log"
 						>

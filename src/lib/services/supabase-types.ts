@@ -101,6 +101,7 @@ export interface Database {
 					notes: string | null;
 					added_at: string;
 					updated_at: string;
+					deleted_at: string | null;
 				};
 				Insert: {
 					user_id: string;
@@ -110,6 +111,7 @@ export interface Database {
 					notes?: string | null;
 					added_at?: string;
 					updated_at?: string;
+					deleted_at?: string | null;
 				};
 				Update: Partial<Database['public']['Tables']['collection_games']['Insert']>;
 			};
@@ -125,6 +127,8 @@ export interface Database {
 					photo_url: string | null;
 					location: string | null;
 					created_at: string;
+					updated_at: string;
+					deleted_at: string | null;
 				};
 				Insert: {
 					user_id: string;
@@ -136,6 +140,8 @@ export interface Database {
 					photo_url?: string | null;
 					location?: string | null;
 					created_at?: string;
+					updated_at?: string;
+					deleted_at?: string | null;
 				};
 				Update: Partial<Database['public']['Tables']['plays']['Insert']>;
 			};

@@ -2,8 +2,10 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { auth } from '$lib/stores/auth.svelte';
+	import { syncStore } from '$lib/stores/sync.svelte';
 	import { onMount } from 'svelte';
 	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
+	import SyncStatus from '$lib/components/SyncStatus.svelte';
 
 	let mobileMenuOpen = $state(false);
 
@@ -12,9 +14,13 @@
 		await auth.initialize();
 	});
 
-	// Redirect to login if not authenticated
+	// Redirect to login if not authenticated, init sync when logged in
 	$effect(() => {
+		if (!auth.loading && auth.isLoggedIn && auth.user) {
+			syncStore.initialize(auth.user.id);
+		}
 		if (!auth.loading && !auth.isLoggedIn) {
+			syncStore.destroy();
 			goto('/login');
 		}
 	});
@@ -31,6 +37,7 @@
 
 	// Sign out
 	async function handleSignOut() {
+		syncStore.destroy();
 		await auth.signOut();
 		goto('/login');
 	}
@@ -75,8 +82,11 @@
 				</ul>
 			</nav>
 
-			<!-- User Profile -->
+			<!-- Sync Status + User Profile -->
 			<div class="p-4 border-t border-border">
+				<div class="mb-3">
+					<SyncStatus />
+				</div>
 				<div class="flex items-center gap-3 mb-3">
 					{#if auth.user?.user_metadata?.avatar_url}
 						<img
@@ -102,10 +112,13 @@
 		<!-- Mobile Header -->
 		<div class="md:hidden fixed top-0 left-0 right-0 bg-surface-1 border-b border-border z-50">
 			<div class="flex items-center justify-between p-4">
-				<a href="/dashboard" class="flex items-center gap-2">
-					<span class="text-2xl">🎲</span>
-					<span class="text-lg font-bold">ShelfLife</span>
-				</a>
+				<div class="flex items-center gap-3">
+					<a href="/dashboard" class="flex items-center gap-2">
+						<span class="text-2xl">🎲</span>
+						<span class="text-lg font-bold">ShelfLife</span>
+					</a>
+					<SyncStatus />
+				</div>
 				<button
 					onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
 					class="btn btn-sm btn-ghost"

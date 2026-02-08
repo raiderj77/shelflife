@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { db } from '$lib/db/dexie';
+	import { db } from '$lib/db/schema';
 	import { onMount } from 'svelte';
 
 	let totalGames = $state(0);
