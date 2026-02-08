@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { db } from '$lib/db/schema';
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores/toast.svelte';
 
 	// State
 	let plays = $state<any[]>([]);
@@ -46,7 +47,7 @@
 
 	async function handleSubmit() {
 		if (!selectedGameBggId) {
-			alert('Please select a game');
+			toast.error('Please select a game');
 			return;
 		}
 
@@ -54,7 +55,7 @@
 
 		try {
 			const game = games.find((g) => g.bggId === selectedGameBggId);
-			
+
 			await db.plays.add({
 				bggId: selectedGameBggId,
 				playedAt: new Date(playedDate),
@@ -74,11 +75,10 @@
 			notes = '';
 			showLogForm = false;
 
-			// Show success message
-			alert(`✅ Logged play of ${game?.name}!`);
+			toast.success(`Logged play of ${game?.name}!`);
 		} catch (error) {
 			console.error('Error logging play:', error);
-			alert('Error logging play. Please try again.');
+			toast.error('Error logging play. Please try again.');
 		} finally {
 			isSubmitting = false;
 		}
@@ -90,6 +90,7 @@
 		const { deletePlay } = await import('$lib/db/schema');
 		await deletePlay(playId);
 		await loadPlays();
+		toast.success('Play log deleted');
 	}
 
 	function formatDate(date: Date) {

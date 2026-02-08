@@ -2,6 +2,8 @@
 	import { db, removeFromCollection, type LocalGame, type LocalCollectionGame } from '$lib/db/schema';
 	import { liveQuery } from 'dexie';
 	import { onMount } from 'svelte';
+	import { toast } from '$lib/stores/toast.svelte';
+	import Skeleton from '$lib/components/Skeleton.svelte';
 
 	// ============================================
 	// State
@@ -11,6 +13,7 @@
 	let timeFilter = $state<number | null>(null);
 	let viewMode = $state<'grid' | 'list'>('grid');
 	let mounted = $state(false);
+	let dataLoaded = $state(false);
 
 	// All collection items with game data joined
 	let allItems = $state<(LocalCollectionGame & { game: LocalGame })[]>([]);
@@ -27,6 +30,7 @@
 			return results;
 		}).subscribe((items) => {
 			allItems = items;
+			dataLoaded = true;
 		});
 		return () => sub.unsubscribe();
 	});
@@ -71,6 +75,9 @@
 		removingBggId = bggId;
 		try {
 			await removeFromCollection(bggId);
+			toast.success(`Removed "${name}" from your collection`);
+		} catch {
+			toast.error('Failed to remove game. Please try again.');
 		} finally {
 			removingBggId = null;
 		}
@@ -180,9 +187,19 @@
 	</div>
 
 	<!-- ============================================ -->
+	<!-- SKELETON LOADING -->
+	<!-- ============================================ -->
+	{#if !dataLoaded}
+		{#if viewMode === 'grid'}
+			<Skeleton variant="card" count={8} />
+		{:else}
+			<Skeleton variant="row" count={5} />
+		{/if}
+
+	<!-- ============================================ -->
 	<!-- EMPTY STATE -->
 	<!-- ============================================ -->
-	{#if mounted && allItems.length === 0}
+	{:else if allItems.length === 0}
 		<div class="text-center py-16 rounded-[var(--radius-card)] bg-surface-50 border border-surface-200 border-dashed">
 			<div class="text-5xl mb-4">📦</div>
 			<h3 class="text-xl font-semibold mb-2">No games yet!</h3>
