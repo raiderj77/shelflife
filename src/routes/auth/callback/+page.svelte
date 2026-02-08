@@ -6,39 +6,32 @@
 	let error = $state('');
 
 	onMount(async () => {
-		const url = new URL(window.location.href);
-		const code = url.searchParams.get('code');
-		const errorParam = url.searchParams.get('error');
-		const errorDescription = url.searchParams.get('error_description');
+		// Check for error params from the provider (query or hash)
+		const params = new URLSearchParams(window.location.search);
+		const hashParams = new URLSearchParams(window.location.hash.substring(1));
 
-		// Handle error from Supabase/provider
+		const errorParam = params.get('error') || hashParams.get('error');
+		const errorDescription =
+			params.get('error_description') || hashParams.get('error_description');
+
 		if (errorParam) {
 			error = errorDescription || errorParam;
 			return;
 		}
 
-		// PKCE flow: exchange the code for a session
-		if (code) {
-			const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-			if (exchangeError) {
-				error = exchangeError.message;
-				return;
-			}
-			goto('/dashboard', { replaceState: true });
-			return;
-		}
-
-		// Implicit flow / magic link: token is in URL hash
-		// detectSessionInUrl: true handles this automatically on client init
-		// Wait for onAuthStateChange to fire
-		const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-			if (event === 'SIGNED_IN' && session) {
+		// With implicit flow + detectSessionInUrl: true, the Supabase client
+		// automatically processes the #access_token hash on initialization.
+		// Listen for the session to become available.
+		const {
+			data: { subscription }
+		} = supabase.auth.onAuthStateChange((event, session) => {
+			if (session) {
 				subscription.unsubscribe();
 				goto('/dashboard', { replaceState: true });
 			}
 		});
 
-		// Check if session already exists (e.g. hash was already processed)
+		// Session may already be available if detectSessionInUrl processed the hash
 		const { data } = await supabase.auth.getSession();
 		if (data.session) {
 			subscription.unsubscribe();
@@ -46,7 +39,7 @@
 			return;
 		}
 
-		// Timeout fallback — if nothing happens in 5 seconds, redirect to login
+		// Timeout — if nothing happens in 5 seconds, redirect to login
 		setTimeout(() => {
 			subscription.unsubscribe();
 			if (!error) {
@@ -62,7 +55,9 @@
 			<div class="text-5xl mb-4">😕</div>
 			<h1 class="text-xl font-bold mb-2">Authentication Error</h1>
 			<p class="text-text-secondary mb-4">{error}</p>
-			<a href="/login" class="text-brand-400 hover:text-brand-300 font-medium">Back to Sign In</a>
+			<a href="/login" class="text-brand-400 hover:text-brand-300 font-medium"
+				>Back to Sign In</a
+			>
 		{:else}
 			<div class="text-4xl mb-4 animate-bounce">🎲</div>
 			<p class="text-text-secondary text-sm">Signing you in...</p>
