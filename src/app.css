@@ -1,0 +1,145 @@
+@import 'tailwindcss';
+
+/* ============================================
+   ShelfLife — Custom Theme
+   Modern 2026 design tokens
+   ============================================ */
+
+@theme {
+  /* Brand Colors */
+  /* Brand Colors - Electric Purple */
+  --color-brand-50: #faf5ff;
+  --color-brand-100: #f3e8ff;
+  --color-brand-200: #e9d5ff;
+  --color-brand-300: #d8b4fe;
+  --color-brand-400: #c084fc;
+  --color-brand-500: #a855f7;
+  --color-brand-600: #9333ea;
+  --color-brand-700: #7e22ce;
+  --color-brand-800: #6b21a8;
+  --color-brand-900: #581c87;
+
+  /* Accent (Game Night warm orange) */
+  /* Accent (Hot Pink/Magenta) */
+  --color-accent-400: #f472b6;
+  --color-accent-500: #ec4899;
+  --color-accent-600: #db2777;
+
+  /* Success / Positive */
+  --color-success-500: #51cf66;
+  --color-success-600: #40c057;
+
+  /* Surface Colors (dark mode first) */
+  /* Surface Colors (Rich dark gaming aesthetic) */
+  --color-surface-0: #0a0a0f;
+  --color-surface-50: #0f0f19;
+  --color-surface-100: #15152d;
+  --color-surface-200: #1a1a3a;
+  --color-surface-300: #20204a;
+  --color-surface-400: #2d2d5a;
+
+  /* Text */
+  --color-text-primary: #f1f3f5;
+  --color-text-secondary: #adb5bd;
+  --color-text-muted: #868e96;
+
+  /* Spacing scale */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+
+  /* Border radius */
+  --radius-card: 1rem;
+  --radius-button: 0.75rem;
+  --radius-pill: 9999px;
+
+  /* Fonts */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: 0 10px 25px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(92, 124, 250, 0.15);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-surface-0);
+  color: var(--color-text-primary);
+  min-height: 100dvh;
+}
+
+/* Smooth scrolling */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* Touch-friendly tap targets (48px minimum per WCAG) */
+@utility touch-target {
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Glass morphism card effect */
+@utility glass {
+  background: rgba(26, 26, 37, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Gradient text utility */
+@utility text-gradient {
+  background: linear-gradient(135deg, var(--color-brand-400), var(--color-accent-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Scrollbar styling */
+@utility scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-surface-300) transparent;
+}
+/* Vibrant Gaming Glow Effects */
+.btn-accent {
+  box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-accent:hover {
+  box-shadow: 0 0 30px rgba(147, 51, 234, 0.6), 0 0 60px rgba(236, 72, 153, 0.3);
+  transform: translateY(-2px);
+}
+
+.card {
+  border: 1px solid rgba(147, 51, 234, 0.15);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(147, 51, 234, 0.4);
+  box-shadow: 0 0 20px rgba(147, 51, 234, 0.15);
+}
+
+h1, h2 {
+  text-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
+}
