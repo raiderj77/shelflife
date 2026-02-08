@@ -1,5 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { auth } from '$lib/stores/auth.svelte';
+
+	// If already authenticated, redirect to dashboard
+	$effect(() => {
+		if (!auth.loading && auth.isLoggedIn) {
+			goto('/dashboard', { replaceState: true });
+		}
+	});
 
 	// Sample game boxes for the grid - real board game titles
 	const gameBoxes = [
