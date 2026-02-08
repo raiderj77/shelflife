@@ -6,33 +6,53 @@
 	let error = $state('');
 
 	onMount(async () => {
-		// Supabase will detect the token from the URL hash automatically
-		// (detectSessionInUrl: true). We just need to wait for it.
-		const { data, error: err } = await supabase.auth.getSession();
+		const url = new URL(window.location.href);
+		const code = url.searchParams.get('code');
+		const errorParam = url.searchParams.get('error');
+		const errorDescription = url.searchParams.get('error_description');
 
-		if (err) {
-			error = err.message;
+		// Handle error from Supabase/provider
+		if (errorParam) {
+			error = errorDescription || errorParam;
 			return;
 		}
 
-		if (data.session) {
-			goto('/dashboard', { replaceState: true });
-		} else {
-			// No session — might need to exchange a code from the URL
-			// Try getting session from URL hash (for implicit flow)
-			const hash = window.location.hash;
-			if (hash) {
-				// Give Supabase a moment to process the hash
-				await new Promise((r) => setTimeout(r, 500));
-				const { data: retryData } = await supabase.auth.getSession();
-				if (retryData.session) {
-					goto('/dashboard', { replaceState: true });
-					return;
-				}
+		// PKCE flow: exchange the code for a session
+		if (code) {
+			const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+			if (exchangeError) {
+				error = exchangeError.message;
+				return;
 			}
-			// Still no session, send to login
-			goto('/login', { replaceState: true });
+			goto('/dashboard', { replaceState: true });
+			return;
 		}
+
+		// Implicit flow / magic link: token is in URL hash
+		// detectSessionInUrl: true handles this automatically on client init
+		// Wait for onAuthStateChange to fire
+		const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+			if (event === 'SIGNED_IN' && session) {
+				subscription.unsubscribe();
+				goto('/dashboard', { replaceState: true });
+			}
+		});
+
+		// Check if session already exists (e.g. hash was already processed)
+		const { data } = await supabase.auth.getSession();
+		if (data.session) {
+			subscription.unsubscribe();
+			goto('/dashboard', { replaceState: true });
+			return;
+		}
+
+		// Timeout fallback — if nothing happens in 5 seconds, redirect to login
+		setTimeout(() => {
+			subscription.unsubscribe();
+			if (!error) {
+				goto('/login', { replaceState: true });
+			}
+		}, 5000);
 	});
 </script>
 
