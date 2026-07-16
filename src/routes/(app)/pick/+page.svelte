@@ -194,7 +194,7 @@
 
 	<!-- Result Card -->
 	{#if showResult && pickedGame}
-		<div class="animate-fade-in">
+		<div data-printable-results class="animate-fade-in">
 			<!-- "You should play..." header -->
 			<div class="text-center mb-6">
 				<p class="text-text-secondary mb-2">You should play...</p>
@@ -261,7 +261,10 @@
 			</div>
 
 			<!-- Action Buttons -->
-			<div class="flex gap-3 justify-center">
+			<div class="no-print flex flex-wrap gap-3 justify-center">
+				<button onclick={() => window.print()} class="btn btn-ghost">
+					Print Pick
+				</button>
 				<button onclick={pickAgain} class="btn btn-ghost">
 					<span class="text-xl">🔄</span>
 					Pick Again

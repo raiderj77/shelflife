@@ -160,3 +160,28 @@ body {
 h1, h2 {
   text-shadow: 0 0 10px rgba(147, 51, 234, 0.3);
 }
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body:has([data-printable-results]) * {
+    visibility: hidden;
+  }
+
+  body:has([data-printable-results]) [data-printable-results],
+  body:has([data-printable-results]) [data-printable-results] * {
+    visibility: visible;
+  }
+
+  body:has([data-printable-results]) [data-printable-results] {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    background: #fff !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+  }
+}
