@@ -102,11 +102,14 @@
 	}
 </script>
 
-<div class="p-6 max-w-6xl mx-auto">
+<div data-printable-results class="p-6 max-w-6xl mx-auto">
 	<!-- Header -->
 	<div class="mb-8">
 		<h1 class="text-3xl font-bold mb-2">📊 Stats & Insights</h1>
 		<p class="text-text-secondary">Your gaming patterns and favorites</p>
+		<button onclick={() => window.print()} class="no-print btn btn-ghost mt-4">
+			Print Stats
+		</button>
 	</div>
 
 	{#if loading}
